@@ -1,0 +1,3 @@
+------ Event Log ---
+Start: bob arrived on bob
+Event 1: Storm avoided, fuel loss: 20

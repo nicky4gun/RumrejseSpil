@@ -1,57 +1,96 @@
+import Exceptions.CriticalStatusException;
+import Exceptions.InvalidTradeException;
+
 import java.util.Scanner;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
 public class Main {
+
     public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Logger logger = new Logger("logs.txt");
+        Status status = new Status(100, 100, 10, 0, false, "Fully operational");
+        Controller controller = new Controller(status, logger);
+
+        runGame(sc, logger, controller);
+    }
+
+    public static void runGame(Scanner sc, Logger logger, Controller controller) {
         boolean running = true;
-           while (running) {
-               try{
-               Scanner scanner = new Scanner(System.in);
-               System.out.println("Hello Captain looks at your name sign:");
-               String name = scanner.nextLine();
-                 if (name.isEmpty())
-                 { System.out.println("huh must have been the wind ");
-                     throw new IllegalArgumentException();}
 
-                   System.out.println("the name you picked was " + name);
-               System.out.println("ah i see your name is " + name + " since you are the captain you need to name our ship:");
-               String ship = scanner.nextLine();
-               if (ship.isEmpty())
-                   {  System.out.println("you are not the captain");
-                       throw new IllegalArgumentException();
-                   }
+        while (running) {
+            try {
+                printIntroBanner();
+                String name = getNameFromUser(sc);
+                String ship = getShipNameFromUser(sc);
 
-                   System.out.println("the name you picked was " + ship);
-               System.out.println("good name captain " + name + " the name " + ship + " is a good name; ");
-               } catch (IllegalArgumentException e ) {
-                   System.out.println("name cant be null");
+                logger.addLog("Start: " + name + " arrived on " + ship);
 
-               }
+                controller.showStatus();
+                controller.showCase(sc);
 
+            } catch (IllegalArgumentException e) {
+                System.out.println("It can not be null ");
+            } catch (CriticalStatusException e) {
+                System.out.println("Critical: " + e.getMessage());
+            } catch (InvalidTradeException e) {
+                System.out.println(e.getMessage());
+            }
 
-               }
-           while (running) {
+            logger.printLog();
+            running = false;
+        }
+    }
 
-             try {
-                 switch() {
-                     case 1:{
+    private static void printIntroBanner() {
+        System.out.println("""
+                ==============================
+                Space Exception Rescue Mission
+                ==============================""");
+    }
 
-                     } break;
-                     case 2: {
+    private static String getNameFromUser(Scanner sc) {
+        boolean running = true;
+        String name = "";
 
-                     } break;
+        while (running) {
+            System.out.print("Hello Captain looks at your name sign: ");
+            name = sc.nextLine().trim();
 
-                 }
+            if (name.isEmpty()) {
+                System.out.println("That is not a name, Please give one!");
+                continue;
+            }
 
-             } catch (Exception e) {
-                 System.out.println(" just for now");
-             }
-
-             }
-           }
+            running = false;
         }
 
+        System.out.println("The name you picked was " + name);
 
+        return name;
+    }
 
+    private static String getShipNameFromUser(Scanner sc) {
+        boolean running = true;
+        String ship = "";
 
+        // System.out.println("ah i see your name is " + name + " since you are the captain you need to name our ship:");
+
+        while (running) {
+            System.out.print("Enter name for your ship: ");
+            ship = sc.nextLine().trim();
+
+            if (ship.isEmpty()) {
+                System.out.println("You have to give the ship a name captain");
+                continue;
+            }
+
+            running = false;
+        }
+
+        System.out.println("Your ship is named: " + ship);
+        // System.out.println("good name captain " + name + " the name " + ship + " is a good name; ");
+
+        return ship;
+    }
+}
