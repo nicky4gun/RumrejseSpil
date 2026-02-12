@@ -1,44 +1,37 @@
-import Exceptions.CriticalStatusException;
-import Exceptions.InvalidTradeException;
+package services;
+
+import models.Status;
+import models.exceptions.CriticalStatusException;
+import models.exceptions.InvalidTradeException;
 
 import java.util.Random;
 import java.util.Scanner;
 
-public class Controller {
+public class EventService {
     private final Status status;
     private final Logger logger;
     private final Random rand = new Random();
 
-    public Controller(Status status, Logger logger) {
+    public EventService(Status status, Logger logger) {
         this.status = status;
         this.logger = logger;
     }
 
-    public void showStatus() {
-        System.out.println(status.printStatus());
-    }
-
-    public void showCase(Scanner sc) throws CriticalStatusException {
-        boolean running = true;
-
-        while (running) {
-            int randInt = rand.nextInt(3) + 1;
-
-            switch (randInt) {
-                case 1 -> eventStorm(sc);
-                case 2 -> eventTrade(sc);
-                case 3 -> eventEngine(sc);
-            }
-        }
-    }
-
     private void checkCriticalStatus() throws CriticalStatusException {
+        if (status.getFuel() <= 0) {
+            throw new CriticalStatusException("Ship ran out of fuel!");
+        }
+
         if (status.getFuel() <= 10) {
             throw new CriticalStatusException("Low of Fuel!");
         }
 
         if (status.getIntegrity() <= 20) {
             throw new CriticalStatusException("Ship almost destroyed");
+        }
+
+        if (status.getIntegrity() <= 0) {
+            throw new CriticalStatusException("Ship destroyed!");
         }
 
         if (status.getShield() < 0) {
@@ -48,14 +41,15 @@ public class Controller {
         // Engine failure twice
     }
 
-    private void eventStorm(Scanner sc) throws CriticalStatusException {
+    public void eventStorm(Scanner sc) throws CriticalStatusException {
         boolean running = true;
+        System.out.println("EVENT 1 - Storm Ahead!");
 
         while (running) {
-            System.out.print("Captain we have a problem, there is a storm a head of us and we need to know what to do: \n");
+            System.out.println("Captain we have a problem, there is a storm a head of us and we need to know what to do: \n");
 
-            System.out.println("(1) its not a big deal (go in to  the storm ): \n");
-            System.out.println("(2) lets go around the storm (you prepare the ship for a detour): ");
+            System.out.println("(1) its not a big deal (go in to  the storm )");
+            System.out.println("(2) lets go around the storm (you prepare the ship for a detour)");
             int input = readInt("Choice: ", sc);
 
             switch (input) {
@@ -96,8 +90,10 @@ public class Controller {
         }
     }
 
-    private void eventTrade(Scanner sc) throws CriticalStatusException {
+    public void eventTrade(Scanner sc) throws CriticalStatusException {
         boolean running = true;
+        System.out.println("EVENT 2 - Trade Opportunity!");
+
 
         System.out.println("Captain we have a problem, there is a trade for you: \n");
         System.out.println("(1) Trade scrap Metal for fuel (1 scrap for 5 fuel) \n");
@@ -115,7 +111,7 @@ public class Controller {
                     int remaingScrap = status.getScrapMetal() - scrap;
                     status.setScrapMetal(remaingScrap);
 
-                    int  newFuel = (scrap * 5) + status.getFuel();
+                    int  newFuel = (scrap * 5);
 
                     if (status.getScrapMetal() <= 0 || newFuel <= 0) {
                         throw new IllegalArgumentException("You dont have enough scrap metal to trade!");
@@ -159,7 +155,7 @@ public class Controller {
         }
     }
 
-    private void eventEngine(Scanner sc) {
+    public void eventEngine(Scanner sc) {
         boolean running = true;
 
         while (running) {

@@ -1,5 +1,12 @@
-import Exceptions.CriticalStatusException;
-import Exceptions.InvalidTradeException;
+package cli;
+
+import controller.Controller;
+import models.exceptions.CriticalStatusException;
+import models.exceptions.InvalidTradeException;
+import models.Status;
+import services.EventService;
+import services.Logger;
+
 
 import java.util.Scanner;
 
@@ -10,9 +17,11 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         Logger logger = new Logger("logs.txt");
         Status status = new Status(100, 100, 10, 0, false, "Fully operational");
-        Controller controller = new Controller(status, logger);
+        EventService eventService = new EventService(status, logger);
+        Controller controller = new Controller(status, logger, eventService);
 
         runGame(sc, logger, controller);
+        sc.close();
     }
 
     public static void runGame(Scanner sc, Logger logger, Controller controller) {
@@ -20,7 +29,7 @@ public class Main {
 
         while (running) {
             try {
-                printIntroBanner();
+                printGameTitle();
                 String name = getNameFromUser(sc);
                 String ship = getShipNameFromUser(sc);
 
@@ -42,7 +51,7 @@ public class Main {
         }
     }
 
-    private static void printIntroBanner() {
+    private static void printGameTitle() {
         System.out.println("""
                 ==============================
                 Space Exception Rescue Mission

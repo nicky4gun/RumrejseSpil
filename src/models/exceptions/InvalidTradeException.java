@@ -1,4 +1,4 @@
-package Exceptions;
+package models.exceptions;
 
 public class InvalidTradeException extends RuntimeException {
     public InvalidTradeException(String message) {

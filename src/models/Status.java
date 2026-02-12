@@ -1,3 +1,5 @@
+package models;
+
 public class Status {
     private int fuel;
     private int integrity;
@@ -64,13 +66,15 @@ public class Status {
     }
 
     public String printStatus() {
-        return "Status" + "\n" +
-                "Fuel:" + fuel + "\n" +
+        return "\n------------------------------\n" +
+                "STATUS" + "\n" +
+                "Fuel: " + fuel + "\n" +
                 "Integrity: " + integrity + "\n" +
                 "Scrap Metal: " + scrapMetal + "\n" +
                 "Shield: " + shield + "\n" +
                 "Repair Kit: " + repairKit + "\n" +
-                "Status: " + status;
+                "Status: " + status + "\n" +
+                "------------------------------\n";
     }
 
 }

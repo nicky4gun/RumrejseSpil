@@ -1,3 +1,5 @@
+package services;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ public class Logger {
 
     public void writeHeader() {
         try (FileWriter fw = new FileWriter(filename, false)) {
-            fw.write("------ Event Log ---\n");
+            fw.write("--------- Event Log ----------\n");
         } catch (IOException e) {
             System.out.println("Unable to write to the logfile.");
         }
@@ -34,15 +36,10 @@ public class Logger {
     }
 
     public void printLog() {
-        System.out.println("------ Mission Log ------");
+        System.out.println("\n--------- Mission Log --------");
 
         for (String log : logs) {
             System.out.println(log);
         }
     }
-
-    public List<String> getLogs() {
-        return logs;
-    }
-
 }
