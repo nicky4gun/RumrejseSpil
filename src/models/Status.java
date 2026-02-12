@@ -5,16 +5,14 @@ public class Status {
     private int integrity;
     private int scrapMetal;
     private int shield;
-    private boolean repairKit;
-    private String status;
+    private boolean repairKitUsed;
 
-    public Status(int fuel, int integrity ,int scrapMetal,int shield,boolean repairKit,String status  ){
+    public Status(int fuel, int integrity, int scrapMetal, int shield, boolean repairKitUsed) {
         this.fuel = fuel;
         this.integrity = integrity;
         this.scrapMetal = scrapMetal;
         this.shield = shield;
-        this.repairKit = repairKit;
-        this.status = status;
+        this.repairKitUsed = repairKitUsed;
     }
 
     public int getFuel() {
@@ -49,20 +47,12 @@ public class Status {
         this.shield = shield;
     }
 
-    public String getStatus(){
-        return status;
+    public boolean getRepairKitUsed(){
+        return repairKitUsed;
     }
 
-    public void setStatus(String status){
-        this.status = status;
-    }
-
-    public boolean getRepairKit(){
-        return repairKit;
-    }
-
-    public void setRepairKit(boolean repairKit){
-        this.repairKit = repairKit;
+    public void setRepairKitUsed(boolean repairKitUsed){
+        this.repairKitUsed = repairKitUsed;
     }
 
     public String printStatus() {
@@ -72,10 +62,8 @@ public class Status {
                 "Integrity: " + integrity + "\n" +
                 "Scrap Metal: " + scrapMetal + "\n" +
                 "Shield: " + shield + "\n" +
-                "Repair Kit: " + repairKit + "\n" +
-                "Status: " + status + "\n" +
+                "Repair Kit: " + repairKitUsed + "\n" +
                 "------------------------------\n";
     }
-
 }
 

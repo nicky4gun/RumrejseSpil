@@ -37,46 +37,39 @@ public class EventService {
         if (status.getShield() < 0) {
             throw new CriticalStatusException("Shield offline!");
         }
-
-        // Engine failure twice
     }
 
     public void eventStorm(Scanner sc) throws CriticalStatusException {
         boolean running = true;
-        System.out.println("EVENT 1 - Storm Ahead!");
+        System.out.println("""
+                EVENT 1 - Storm Ahead!
+                Captain we have a problem, there is a storm a head of us and we need to know what to do?
+                
+                Choose an option:
+                (1) Its not a big deal (go in to  the storm)
+                (2) Lets go around the storm (you prepare the ship for a detour)""");
 
         while (running) {
-            System.out.println("Captain we have a problem, there is a storm a head of us and we need to know what to do: \n");
-
-            System.out.println("(1) its not a big deal (go in to  the storm )");
-            System.out.println("(2) lets go around the storm (you prepare the ship for a detour)");
-            int input = readInt("Choice: ", sc);
+            int input = readInt("\nChoice: ", sc);
 
             switch (input) {
                 case 1 -> {
                     int damage = rand.nextInt(100)+1;
-                    System.out.println("OW the storm did "+ damage + " to the ship but at least");
-                    int newIntegrity = status.getIntegrity() - damage;
+                    System.out.println("Ow the storm did "+ damage + " damage to the ship");
 
-                    if (status.getIntegrity() <= 0) {
-                        System.out.println("Ship dead");
-                    }
-
-                    status.setIntegrity(newIntegrity);
+                    status.setIntegrity(status.getIntegrity() - damage);
 
                     System.out.println(status.printStatus());
                     logger.addLog("Event 1: Storm chosen, damage: " + damage);
                     checkCriticalStatus();
-
 
                     return;
                 }
 
                 case 2 -> {
                     int fuel = 20;
-                    System.out.println("Captain we got around the storm but we lost "+fuel+" to the ship  ");
-                    int newFuel = status.getFuel() - fuel;
-                    status.setFuel(newFuel);
+                    System.out.println("Captain we got around the storm but we lost " + fuel + " to the ship");
+                    status.setFuel(status.getFuel() - fuel);
 
                     System.out.println(status.printStatus());
                     logger.addLog("Event 1: Storm avoided, fuel loss: " + fuel);
@@ -92,107 +85,390 @@ public class EventService {
 
     public void eventTrade(Scanner sc) throws CriticalStatusException {
         boolean running = true;
-        System.out.println("EVENT 2 - Trade Opportunity!");
-
-
-        System.out.println("Captain we have a problem, there is a trade for you: \n");
-        System.out.println("(1) Trade scrap Metal for fuel (1 scrap for 5 fuel) \n");
-        System.out.println("(2) Buy shield for scrap Metal (Level 1 shield for 5 scrap) \n");
-        System.out.println("(3) Decline (you dont trade)");
+        System.out.println("""
+                EVENT 2 - Trade Opportunity!
+                Captain we have a problem, there is a trade for you
+                
+                Choose an option:
+                (1) Trade scrap Metal for fuel (1 scrap for 5 fuel)
+                (2) Buy shield for scrap Metal (Level 1 shield for 5 scrap)
+                (3) Decline (you dont trade)""");
 
         while (running) {
+            try {
+                int input = readInt("\nChoice: ", sc);
 
-            int input = readInt("Choice: ", sc);
+                switch (input) {
+                    case 1 -> {
+                        System.out.println("How much do you want to trade? \n");
+                        int scrap = readInt("Choice: ", sc);
 
-            switch (input) {
-                case 1 -> {
-                    System.out.println("How much do you want to trade \n");
-                    int scrap = readInt("Choice: ", sc);
-                    int remaingScrap = status.getScrapMetal() - scrap;
-                    status.setScrapMetal(remaingScrap);
+                        if (scrap <= 0) {
+                            throw new IllegalArgumentException("Invalid amount. Please enter a positive number.");
+                        }
 
-                    int  newFuel = (scrap * 5);
+                        if (scrap > status.getScrapMetal()) {
+                            throw new InvalidTradeException("You do not have enough scrap metal to trade");
+                        }
 
-                    if (status.getScrapMetal() <= 0 || newFuel <= 0) {
-                        throw new IllegalArgumentException("You dont have enough scrap metal to trade!");
+                        if (status.getFuel() >= 100) {
+                            throw new IllegalArgumentException("Too much fuel can't get over 100 in fuel");
+                        }
+                        int fuelAmount = scrap * 5;
+                        int newFuel = status.getFuel() + fuelAmount;
+
+
+
+                        status.setScrapMetal(status.getScrapMetal() - scrap);
+                        status.setFuel(newFuel);
+
+                        System.out.println(status.printStatus());
+                        logger.addLog("Event 2: Traded " + scrap + " scrap for " + fuelAmount + " fuel");
+                        checkCriticalStatus();
+                        return;
                     }
 
-                    if ( status.getFuel() > 100) {
-                        throw new IllegalArgumentException("to much fuel can't get over 100 in fuel");
+                    case 2 -> {
+                        int amount = 5;
+
+                        if (status.getScrapMetal() < amount) {
+                            throw new InvalidTradeException("You do not have enough scrap metal to trade");
+                        }
+
+                        status.setScrapMetal(status.getScrapMetal() - amount);
+                        status.setShield(status.getShield() + 1);
+
+                        System.out.println(status.printStatus());
+                        logger.addLog("Event 2: Shield upgrade to level 1");
+                        checkCriticalStatus();
+                        return;
                     }
 
-                    status.setFuel(newFuel);
+                    case 3 -> {return;}
 
-                    System.out.println(status.printStatus());
-                    logger.addLog("Event 2: Traded " + scrap + " scrap for " + newFuel + " fuel");
-                    checkCriticalStatus();
-
-                    return;
+                    default -> System.out.println("Not an option! Try again");
                 }
 
-                case 2 -> {
-                    int amount = 5;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid input: " + e.getMessage());
 
-                    if (status.getScrapMetal() < amount) {
-                        throw new InvalidTradeException("You do not have enough scrap metal to trade");
-                    }
-
-                    status.setScrapMetal(status.getScrapMetal() - amount);
-                    status.setShield(status.getShield() + 1);
-
-                    System.out.println(status.printStatus());
-                    logger.addLog("Event 2: Shield upgrade to level 1");
-                    checkCriticalStatus();
-                    return;
-                }
-
-                case 3 -> {
-                    return;
-                }
-
-                default -> System.out.println("Not an option! Try again");
+            } catch (InvalidTradeException e) {
+                System.out.println("Trade error: " + e.getMessage());
+                logger.addLog("Trade error: " + e.getMessage());
             }
         }
     }
 
-    public void eventEngine(Scanner sc)throws CriticalStatusException {
+    public void eventEngine(Scanner sc) throws CriticalStatusException {
         boolean running = true;
-        System.out.println("captain oure ships motor has stoped working we need to use a repair kid or we can always try turning it on and off but this my not work \n ");
-        System.out.println("(1) we do have a repair kit use that (this will make the motor start) \n");
-        System.out.println("(2) we dont have a repair kit (there is a 40 procent that turning it on and off will work ) ");
+        System.out.println("""
+                EVENT 3 - Engine Failure!
+                Captain oure ships motor has stopped working we need to use a repair kid or we can always try turning it on and off but this my not work
+                
+                Choose an option:
+                (1) We do have a repair kit use that (this will make the motor start)
+                (2) We dont have a repair kit (there is a 40 procent that turning it on and off will work )""");
 
 
         while (running) {
-            int input = readInt("Choice: ", sc);
+            try {
+                int input = readInt("\nChoice: ", sc);
 
-            switch (input) {
-                case 1 -> {
-                    if (status.getRepairKit() == true){
-                        throw new IllegalArgumentException("You dont have a reparing kit");
+                switch (input) {
+                    case 1 -> {
+                        if (status.getRepairKitUsed()) {
+                            status.setIntegrity(status.getIntegrity() - 100);
+                            System.out.println("You have already used the repair kit before");
+                            logger.addLog("Event 3: Mortor could not be repaired because repair kit was already used ");
+                            checkCriticalStatus();
+                            return;
+                        }
 
+                        if (status.getIntegrity() < 100) {
+                            int newIntegrity = status.getIntegrity() + 20;
+                            status.setIntegrity(newIntegrity);
+                            System.out.println("Repair kit used, integrity +20");
+
+                        } else {
+                            System.out.println("The motor is already at full integrity, the repair kit had no effect");
+                            System.out.println("Repair kit used");
+                        }
+
+                        status.setRepairKitUsed(true);
+
+                        System.out.println(status.printStatus());
+                        logger.addLog("Event3: Motor is now working because we used the repair kit ");
+                        checkCriticalStatus();
+                        return;
                     }
 
-                    System.out.println("we do have a repair kit ");
-                    status.setRepairKit(true);
-                    logger.addLog("Event:3 Mortor is now working because we used the repair kit ");
-                    return;
+                    case 2 -> {
+                        try {
+                            if (rand.nextInt(100) < 40) {
+                                System.out.println("It worked the motor has started working again");
+
+                                System.out.println(status.printStatus());
+                                logger.addLog("Event 3: Mortor is now working because we turned it on and off ");
+                                checkCriticalStatus();
+                                return;
+
+                            } else if (rand.nextInt(100) < 50) {
+                                int motorDamage = 10;
+                                status.setIntegrity(status.getIntegrity() - motorDamage);
+                                System.out.println("It took some time but it did work, integrity -10 ");
+
+                                System.out.println(status.printStatus());
+                                logger.addLog("Event 3: Motor is now working because we turned it on and off but it took some time ");
+                                checkCriticalStatus();
+                                return;
+
+                            } else {
+                                throw new CriticalStatusException("We are lost in space captain");
+                            }
+                        } catch (CriticalStatusException e) {
+                            System.out.println(e.getMessage());
+                            logger.addLog("Event 3: Motor failure resulted in critical status: " + e.getMessage());
+                            throw e;
+
+                        } finally {
+                            logger.addLog("Event 3: Motor restart attempt completed.");
+                            System.out.println("System check complete.\n");
+                        }
+                    }
+
+                    default -> System.out.println("Not an option! Try again");
                 }
-                case 2 -> {
-                    if (rand.nextInt(100) <40) {
-                        System.out.println("it worked the motor has");
-                    }
-                        else if (rand.nextInt(100)<30){
-                        System.out.println("it took some time but it did work ");
-                    } else {
-                          throw new CriticalStatusException("we are lost in space captain" );
 
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid input: " + e.getMessage());
+            }
+        }
+
+    }
+
+    public void eventAlien(Scanner sc) throws CriticalStatusException {
+        boolean running = true;
+        System.out.println("""
+                EVENT 4 - Alien Encounter!
+                Captain we have a problem, there is an alien ship in front of us and we need to know what to do?
+                
+                Choose an option:
+                (1) Attack the alien ship
+                (2) Try to communicate with the alien ship""");
+
+        while (running) {
+            try {
+                int input = readInt("\nChoice: ", sc);
+
+                switch (input) {
+                    case 1 -> {
+                        int damage = rand.nextInt(50) + 1;
+                        System.out.println("Ow the alien ship did " + damage + " damage to the ship but at least we got rid of them");
+
+                        status.setIntegrity(status.getIntegrity() - damage);
+
+                        System.out.println(status.printStatus());
+                        logger.addLog("Event 4: Attacked alien ship, damage taken: " + damage);
+                        checkCriticalStatus();
+
+                        return;
                     }
 
+                    case 2 -> {
+                        if (rand.nextInt(100) < 50) {
+                            System.out.println("The aliens were friendly and gave us some scrap metal");
+                            int scrapGain = rand.nextInt(5) + 1;
+                            status.setScrapMetal(status.getScrapMetal() + scrapGain);
+                            logger.addLog("Event 4: Communicated with aliens, gained " + scrapGain + " scrap metal");
+                        } else {
+                            int damage = rand.nextInt(30) + 1;
+                            System.out.println("The aliens were hostile and did " + damage + " to the ship ");
+
+                            status.setIntegrity(status.getIntegrity() - damage);
+
+                            System.out.println(status.printStatus());
+                            logger.addLog("Event 4: Communicated with aliens, took " + damage + " damage");
+                            checkCriticalStatus();
+                        }
+
+                        return;
+                    }
+
+                    default -> System.out.println("Not an option! Try again");
                 }
-                default -> System.out.println("Not an option! Try again");
+
+            } catch (IllegalArgumentException e){
+                System.out.println("Invalid: " + e.getMessage());
+            }
+
+        }
+    }
+
+    public void eventAsteroid(Scanner sc) throws CriticalStatusException {
+        boolean running = true;
+        System.out.println("""
+                EVENT 5 - Asteroid Field!
+                Captain we have a problem, there is an asteroid field in front of us and we need to know what to do?
+                
+                Choose an option:
+                (1) Try to navigate through the asteroid field
+                (2) Go around the asteroid field""");
+
+        while (running) {
+            try {
+                int input = readInt("\nChoice: ", sc);
+
+                switch (input) {
+                    case 1 -> {
+                        int damage = rand.nextInt(40) + 1;
+                        System.out.println("OW the asteroids did " + damage + " to the ship but at least we got through them");
+
+                        status.setIntegrity(status.getIntegrity() - damage);
+
+                        System.out.println(status.printStatus());
+                        logger.addLog("Event 5: Navigated asteroid field, damage taken: " + damage);
+                        checkCriticalStatus();
+
+                        return;
+                    }
+
+                    case 2 -> {
+                        int fuelLoss = 15;
+                        System.out.println("We went around the asteroid field, but lost " + fuelLoss + " fuel in the process");
+                        int newFuel = status.getFuel() - fuelLoss;
+                        status.setFuel(newFuel);
+
+                        System.out.println(status.printStatus());
+                        logger.addLog("Event 5: Avoided asteroid field, fuel loss: " + fuelLoss);
+                        checkCriticalStatus();
+
+                        return;
+                    }
+
+                    default -> System.out.println("Not an option! Try again");
+                }
+
+            } catch (IllegalArgumentException e){
+                System.out.println("Invalid: " + e.getMessage());
             }
         }
     }
+
+    public void eventPirate (Scanner sc) throws CriticalStatusException {
+        boolean running = true;
+        System.out.println("""
+                EVENT 6 - Space Pirates!
+                Captain we have a problem, there are space pirates attacking us and we need to know what to do?
+                
+                Choose an option:
+                (1) Fight the space pirates
+                (2) Try to escape from the space pirates""");
+
+        while (running) {
+            try {
+                int input = readInt("\nChoice: ", sc);
+
+                switch (input) {
+                    case 1 -> {
+                        int damage = rand.nextInt(60) + 1;
+                        System.out.println("Ow the space pirates did " + damage + " to the ship but at least we got rid of them");
+
+                        status.setIntegrity(status.getIntegrity() - damage);
+
+                        System.out.println(status.printStatus());
+                        logger.addLog("Event 6: Fought space pirates, damage taken: " + damage);
+                        checkCriticalStatus();
+
+                        return;
+                    }
+
+                    case 2 -> {
+                        if (rand.nextInt(100) < 50) {
+                            System.out.println("We successfully escaped from the space pirates!");
+                            logger.addLog("Event 6: Successfully escaped from space pirates");
+
+                        } else {
+                            int damage = rand.nextInt(40) + 1;
+                            System.out.println("We failed to escape and the space pirates did " + damage + " to the ship ");
+
+                            status.setIntegrity(status.getIntegrity() - damage);
+
+                            System.out.println(status.printStatus());
+                            logger.addLog("Event 6: Failed to escape from space pirates, took " + damage + " damage");
+                            checkCriticalStatus();
+                        }
+
+                        return;
+                    }
+
+                    default -> System.out.println("Not an option! Try again");
+                }
+
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid: " + e.getMessage());
+            }
+        }
+    }
+
+    public void eventDerelict (Scanner sc) throws CriticalStatusException {
+        boolean running = true;
+        System.out.println("""
+                EVENT 7 - Derelict Ship!
+                Captain we have a problem, there is a derelict ship in front of us and we need to know what to do?
+                
+                Choose an option:
+                (1) Board the derelict ship
+                (2) Ignore the derelict ship""");
+
+        while (running) {
+            try {
+                int input = readInt("\nChoice: ", sc);
+
+                switch (input) {
+                    case 1 -> {
+                        if (rand.nextInt(100) < 50) {
+                            System.out.println("We found some useful scrap metal on the derelict ship!");
+                            int scrapGain = rand.nextInt(10) + 1;
+                            status.setScrapMetal(status.getScrapMetal() + scrapGain);
+
+                            System.out.println(status.printStatus());
+                            logger.addLog("Event 7: Boarded derelict ship, gained " + scrapGain + " scrap metal");
+                            checkCriticalStatus();
+                            return;
+
+                        } else {
+                            int damage = rand.nextInt(30) + 1;
+                            System.out.println("The derelict ship was unstable and did " + damage + " to our ship ");
+
+                            status.setIntegrity(status.getIntegrity() - damage);
+
+                            System.out.println(status.printStatus());
+                            logger.addLog("Event 7: Boarded derelict ship, took " + damage + " damage");
+                            checkCriticalStatus();
+
+                            return;
+                        }
+                    }
+
+                    case 2 -> {
+                        System.out.println("We ignored the derelict ship and continued on our way.");
+
+                        System.out.println(status.printStatus());
+                        logger.addLog("Event 7: Ignored derelict ship");
+                        checkCriticalStatus();
+
+                        return;
+                    }
+
+                    default -> System.out.println("Not an option! Try again");
+                }
+
+            } catch (IllegalArgumentException e){
+                System.out.println("Invalid: " + e.getMessage());
+            }
+        }
+    }
+
 
     public int readInt(String prompt, Scanner sc) {
         while (true) {
@@ -201,7 +477,7 @@ public class EventService {
             String input = sc.nextLine().trim();
 
             if (input.isEmpty()) {
-                System.out.println("input is empty");
+                System.out.println("Input is empty");
                 continue;
             }
 

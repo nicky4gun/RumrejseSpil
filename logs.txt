@@ -1,6 +1,3 @@
 --------- Event Log ----------
-Start: Test arrived on TestShip
-Event 1: Storm avoided, fuel loss: 20
-Event 1: Storm chosen, damage: 78
-Event 2: Shield upgrade to level 1
-Event 1: Storm chosen, damage: 73
+Start: bob arrived on bo
+Event3: Motor is now working because we used the repair kit 

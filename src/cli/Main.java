@@ -2,7 +2,6 @@ package cli;
 
 import controller.Controller;
 import models.exceptions.CriticalStatusException;
-import models.exceptions.InvalidTradeException;
 import models.Status;
 import services.EventService;
 import services.Logger;
@@ -16,38 +15,35 @@ public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         Logger logger = new Logger("logs.txt");
-        Status status = new Status(100, 100, 10, 0, false, "Fully operational");
+        Status status = new Status(100, 100, 10, 0, false);
         EventService eventService = new EventService(status, logger);
-        Controller controller = new Controller(status, logger, eventService);
+        Controller controller = new Controller(status, eventService);
 
         runGame(sc, logger, controller);
         sc.close();
     }
 
     public static void runGame(Scanner sc, Logger logger, Controller controller) {
-        boolean running = true;
+        try {
+            printGameTitle();
+            String name = getNameFromUser(sc);
+            String ship = getShipNameFromUser(sc);
 
-        while (running) {
-            try {
-                printGameTitle();
-                String name = getNameFromUser(sc);
-                String ship = getShipNameFromUser(sc);
+            logger.addLog("Start: " + name + " arrived on " + ship);
 
-                logger.addLog("Start: " + name + " arrived on " + ship);
+            controller.showStatus();
+            controller.startGame(sc);
 
-                controller.showStatus();
-                controller.showCase(sc);
+            printGameSucces();
+            logger.addLog("End: Mission Accomplished for " + name + " on " + ship);
 
-            } catch (IllegalArgumentException e) {
-                System.out.println("It can not be null ");
-            } catch (CriticalStatusException e) {
-                System.out.println("Critical: " + e.getMessage());
-            } catch (InvalidTradeException e) {
-                System.out.println(e.getMessage());
-            }
+        } catch (CriticalStatusException e) {
+            System.out.println("GAME OVER: " + e.getMessage());
+            System.out.println("Better luck next time Captain!");
+            logger.addLog("End: Mission Failed - " + e.getMessage());
 
+        } finally {
             logger.printLog();
-            running = false;
         }
     }
 
@@ -58,12 +54,20 @@ public class Main {
                 ==============================""");
     }
 
+    private static void printGameSucces() {
+        System.out.println("""
+                Mission Accomplished!
+                You have survived your mission""");
+    }
+
     private static String getNameFromUser(Scanner sc) {
         boolean running = true;
         String name = "";
 
         while (running) {
-            System.out.print("Hello Captain looks at your name sign: ");
+            System.out.print("Hello Captain!\n");
+            System.out.print("What is your name?: ");
+
             name = sc.nextLine().trim();
 
             if (name.isEmpty()) {
@@ -83,10 +87,8 @@ public class Main {
         boolean running = true;
         String ship = "";
 
-        // System.out.println("ah i see your name is " + name + " since you are the captain you need to name our ship:");
-
         while (running) {
-            System.out.print("Enter name for your ship: ");
+            System.out.print("Enter your ships name: ");
             ship = sc.nextLine().trim();
 
             if (ship.isEmpty()) {
@@ -98,8 +100,6 @@ public class Main {
         }
 
         System.out.println("Your ship is named: " + ship);
-        // System.out.println("good name captain " + name + " the name " + ship + " is a good name; ");
-
         return ship;
     }
 }
