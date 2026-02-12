@@ -155,16 +155,39 @@ public class EventService {
         }
     }
 
-    public void eventEngine(Scanner sc) {
+    public void eventEngine(Scanner sc)throws CriticalStatusException {
         boolean running = true;
+        System.out.println("captain oure ships motor has stoped working we need to use a repair kid or we can always try turning it on and off but this my not work \n ");
+        System.out.println("(1) we do have a repair kit use that (this will make the motor start) \n");
+        System.out.println("(2) we dont have a repair kit (there is a 40 procent that turning it on and off will work ) ");
+
 
         while (running) {
             int input = readInt("Choice: ", sc);
 
             switch (input) {
                 case 1 -> {
-                    System.out.println("Hello3!");
-                    running = false;
+                    if (status.getRepairKit() == true){
+                        throw new IllegalArgumentException("You dont have a reparing kit");
+
+                    }
+
+                    System.out.println("we do have a repair kit ");
+                    status.setRepairKit(true);
+                    logger.addLog("Event:3 Mortor is now working because we used the repair kit ");
+                    return;
+                }
+                case 2 -> {
+                    if (rand.nextInt(100) <40) {
+                        System.out.println("it worked the motor has");
+                    }
+                        else if (rand.nextInt(100)<30){
+                        System.out.println("it took some time but it did work ");
+                    } else {
+                          throw new CriticalStatusException("we are lost in space captain" );
+
+                    }
+
                 }
                 default -> System.out.println("Not an option! Try again");
             }
