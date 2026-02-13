@@ -55,6 +55,14 @@ public class Status {
         this.repairKitUsed = repairKitUsed;
     }
 
+    public String getRepairKitStatus() {
+        if (repairKitUsed) {
+            return "Used";
+        } else {
+            return "Available";
+        }
+    }
+
     public String printStatus() {
         return "\n------------------------------\n" +
                 "STATUS" + "\n" +
@@ -62,7 +70,7 @@ public class Status {
                 "Integrity: " + integrity + "\n" +
                 "Scrap Metal: " + scrapMetal + "\n" +
                 "Shield: " + shield + "\n" +
-                "Repair Kit: " + repairKitUsed + "\n" +
+                "Repair Kit: " + getRepairKitStatus() + "\n" +
                 "------------------------------\n";
     }
 }

@@ -1,3 +1,11 @@
 --------- Event Log ----------
-Start: bob arrived on bo
+Start: Jannik arrived on ComSci
+Event 7: Boarded derelict ship, took 18 damage
 Event3: Motor is now working because we used the repair kit 
+Event 2: Trade declined
+Event 4: Communicated with aliens, took 14 damage
+Event 7: Ignored derelict ship
+Event 3: Mortor could not be repaired because repair kit was already used
+Event3: Motor is now working because we used the repair kit 
+Event 4: Attacked alien ship, damage taken: 12
+End: Mission Accomplished for Jannik on ComSci
