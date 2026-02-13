@@ -179,23 +179,23 @@ public class EventService {
                     if (status.getRepairKitUsed()) {
                         System.out.println("You have already used the repair kit before, Try option 2");
                         logger.addLog("Event 3: Mortor could not be repaired because repair kit was already used");
+                        continue;
                     }
 
                     if (status.getIntegrity() < 100) {
                         int newIntegrity = status.getIntegrity() + 20;
                         status.setIntegrity(newIntegrity);
                         System.out.println("Repair kit used, integrity +20");
+                        status.setRepairKitUsed(true);
 
                     } else {
                         System.out.println("The motor is already at full integrity, the repair kit had no effect");
-                        System.out.println("Repair kit used");
                     }
 
-                    status.setRepairKitUsed(true);
-
                     System.out.println(status.printStatus());
-                    logger.addLog("Event3: Motor is now working because we used the repair kit ");
+                    logger.addLog("Event 3: Motor is now working because we used the repair kit");
                     checkCriticalStatus();
+
                     return;
                 }
 
@@ -224,15 +224,16 @@ public class EventService {
                         return;
 
                     } finally {
+                        System.out.println("Systems check complete.");
+
+                        System.out.println(status.printStatus());
                         logger.addLog("Event 3: Motor restart attempt completed.");
-                        System.out.println("Systems check complete.\n");
                     }
                 }
 
                 default -> System.out.println("Not an option! Try again");
             }
         }
-
     }
 
     public void eventAlien(Scanner sc) throws CriticalStatusException {
