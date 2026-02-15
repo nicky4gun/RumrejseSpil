@@ -17,7 +17,7 @@ public class Main {
         Logger logger = new Logger("logs.txt");
         Status status = new Status(100, 100, 10, 0, false);
         EventService eventService = new EventService(status, logger);
-        Controller controller = new Controller(status, eventService);
+        Controller controller = new Controller(status, eventService, logger);
 
         runGame(sc, logger, controller);
         sc.close();

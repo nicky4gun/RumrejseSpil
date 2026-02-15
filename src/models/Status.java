@@ -20,7 +20,7 @@ public class Status {
     }
 
     public void setFuel(int fuel) {
-        this.fuel = fuel;
+        this.fuel = Math.max(0, Math.min(100, fuel));
     }
 
     public int getIntegrity() {
@@ -28,7 +28,7 @@ public class Status {
     }
 
     public void setIntegrity(int integrity) {
-        this.integrity = integrity;
+        this.integrity = Math.max(0, Math.min(100, integrity));
     }
 
     public int getScrapMetal() {
@@ -36,7 +36,7 @@ public class Status {
     }
 
     public void setScrapMetal(int scrapMetal) {
-        this.scrapMetal = scrapMetal;
+        this.scrapMetal = Math.max(0, scrapMetal);
     }
 
     public int getShield() {
@@ -44,7 +44,7 @@ public class Status {
     }
 
     public void setShield(int shield) {
-        this.shield = shield;
+        this.shield = Math.max(0, shield);
     }
 
     public boolean getRepairKitUsed(){
